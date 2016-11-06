@@ -1,0 +1,48 @@
+ID01 Puella Magi Madoka Magica Portable	                                  March 15, 2012        Namco Bandai Games       
+ID02 Great Battle Fullblast                                               March 1, 2012	        Inti-Creates             
+ID03 Super Robot Taisen OG Saga: Masou Kishin II: Revelation of Evil God  January,12,2012       Namco Bandai Games       
+ID04 Photo Kano	                                                          February,2,2012       Dingo Inc.               
+ID05 Boku wa Tomodachi ga Sukunai Portable                                February 23, 2012     Namco Bandai Games       
+ID06 Tales of the Heroes: Twin Brave                                      February 23, 2012     Namco Bandai Games       
+ID07 Nendoroid Generations                                                February 23, 2012     Namco Bandai Games       
+ID08 Kurohyou 2: Ryu ga Gotoku Asyura hen                                 March 22, 2012        syn Sophia               
+ID09 Shining Blade                                                        March 15, 2012        Sega                     
+ID11 Genso Suikoden: Tsumugareshi Hyakunen no Toki                        February 9, 2012      Konami                   
+ID11 Kidou Senshi Gundam: Mokuba no Kiseki                                January 26, 2012      Namco Bandai Games       
+ID12 Magical Girl Lyrical Nanoha A's Portable: The Gears of Destiny       December 22, 2011     Namco Bandai Games       
+ID13 Frontier Gate                                                        December 22, 2011     tri-Ace                  
+ID14 Lord of Apocalypse                                                   December 17, 2011     Square Enix              
+ID15 Beyond the Future Fix: The Time Arrow                                December 1, 2011      5pb.                     
+ID16 Kamen Rider: Climax Heroes Fourze                                    December 1, 2011      Eighting                 
+ID17 Maid*Paradise: Mezase! Maid Number One! (PSN)                        November 2, 2011      Spike                    
+ID18 Weiss Schwarz Portable: Boost Schwarz                                November 23, 2011     Namco Bandai Games       
+ID19 Little Battlers eXperience Boost                                     November 23, 2011     Level-5                  
+ID20 7th Dragon 2020                                                      November 23, 2011     Imageepoch               
+ID21 Pop'n Music Portable 2                                               November 23, 2011     Konami                   
+ID22 Weiss Schwarz Portable: Boost Weiss                                  November 23, 2011     Namco Bandai Games       
+ID23 Valkyria Chronicles III: Unrecorded Chronicles Extra Edition         November 23, 2011     Media.Vision             
+ID24 The Walking Dead: Episode One                                        April 27, 2012        Telltale Games           
+ID25 Bloodforge                                                           April 25, 2012        Climax Group             
+ID26 Deep Black: Episode 1                                                April 25, 2012        Biart                    
+ID27 Trials Evolution                                                     April 18, 2012        RedLynx                  
+ID28 Fez                                                                  April 13, 2012        Polytron                 
+ID29 World Gone Sour                                                      April 11, 2012        Capcom                   
+ID30 Skullgirls                                                           April 11, 2012        Games                    
+ID31 The Splatters                                                        April 11, 2012        SpikySnail Game Studio   
+ID32 Anomaly: Warzone Earth 11                                            April 6, 2012         bit studios              
+ID33 The Pinball Arcade                                                   April 4, 2012         FarSight Studios         
+ID34 Diabolical Pitch                                                     April 4, 2012         Grasshopper Manufacture  
+ID35 South Park: Tenorman's Revenge                                       March 30, 2012        Other Ocean Interactive  
+ID36 Wrecked: Revenge Revisited                                           March 28, 2012        Supersonic Software      
+ID37 Sine Mora                                                            March 21, 2012        Grasshopper Manufacture  
+ID38 Rayman 3 HD                                                          March 21, 2012        Ubisoft                  
+ID39 Defenders of Ardania                                                 March 14, 2012        Most Wanted Entertainment
+ID40 Shoot Many Robots                                                    March 14, 2012        Demiurge Studios         
+ID41 I Am Alive                                                           March 7, 2012         Ubisoft                  
+ID42 Nexuiz                                                               February 29, 2012     Illfonic                 
+ID43 Alan Wake's American Nightmare                                       February 22, 2012     Remedy Entertainment      
+ID44 Warp                                                                 February 15, 2012     trapdoor                 
+ID45 Gotham City Impostors                                                February 8, 2012      Monolith Productions     
+ID46 Shank 2	                                                          February 8, 2012      Klei Entertainment       
+ID47 The Simpsons Arcade Game                                             February 3, 2012      Konami                   
+     
