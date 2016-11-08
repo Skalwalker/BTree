@@ -43,5 +43,5 @@ ID42 Nexuiz                                                               Februa
 ID43 Alan Wake's American Nightmare                                       February 22, 2012     Remedy Entertainment     
 ID44 Warp                                                                 February 15, 2012     trapdoor                 
 ID45 Gotham City Impostors                                                February 8, 2012      Monolith Productions     
-ID46 Shank 2	                                                          February 8, 2012      Klei Entertainment       
+ID46 Shank 2	                                                            February 8, 2012      Klei Entertainment       
 ID47 The Simpsons Arcade Game                                             February 3, 2012      Konami                   
