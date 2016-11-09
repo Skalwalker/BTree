@@ -1,6 +1,20 @@
 #include <stdio.h>
 #include <string.h>
 
+#define M 5
+
+typedef struct chave{
+
+}t_chave;
+
+
+typedef struct no{
+    int contador = M-1 /* Conta a contidade de chaves, 4 */
+    t_chave chaves[M-1] /* Estrutura de vetor do tipo t_chave, 4 */
+    int prr[M-1] /* Qtd de prr, 4*/
+    int filhos[M] /* Qtd  max de filhos 5*/
+}t_no;
+
 int cliParser(int argc, char *argv[], FILE *fp, int *registerType){
     int validate = 0;
 
