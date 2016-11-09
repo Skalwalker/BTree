@@ -4,7 +4,7 @@
 #define M 5
 
 typedef struct chave{
-
+    char chave[7]
 }t_chave;
 
 
@@ -12,8 +12,18 @@ typedef struct no{
     int contador = M-1 /* Conta a contidade de chaves, 4 */
     t_chave chaves[M-1] /* Estrutura de vetor do tipo t_chave, 4 */
     int prr[M-1] /* Qtd de prr, 4*/
-    int filhos[M] /* Qtd  max de filhos 5*/
+    int pFilhos[M] /* Qtd  max de filhos 5*/
 }t_no;
+
+t_no *cria_no(){
+    int i;
+    t_no *no = (*t_no)malloc(sizeof(t_no))
+    
+    for(i=0;i<;i++)
+
+
+}
+
 
 int cliParser(int argc, char *argv[], FILE *fp, int *registerType){
     int validate = 0;
