@@ -4,6 +4,9 @@
 #include <math.h>
 
 #define M 5
+#define TRUE 1
+#define FALSE 0
+#define T 2
 
 FILE *fp;
 
@@ -15,22 +18,24 @@ typedef struct chave{
 
 typedef struct no{
     int contador; /* Conta a contidade de chaves, 4 */
-    t_chave chaves[M-1]; /* Estrutura de vetor do tipo t_chave, 4 */
-    struct t_no *pFilhos[M]; /* Qtd  max de filhos 5*/
+    int folha;
+    t_chave chaves[M];//M-1 /* Estrutura de vetor do tipo t_chave, 4 */
+    struct no *pFilhos[M+1];//M /* Qtd  max de filhos 5*/
 }t_no;
 
-typedef struct root{
-    t_no *root;
-}t_root;
+// typedef struct root{
+//     t_no *root;
+// }t_root;
 
 t_no *cria_no(){
     int i;
     t_no *no = (t_no*)malloc(sizeof(t_no));
     
     no->contador = 0;
+    no->folha = FALSE;
     for (i=0;i<M-2;i++) {
         no->chaves[i].ident = -1;
-        no->pFilhos[i] = NULL
+        no->pFilhos[i] = NULL;
     }
     no->pFilhos[i] = NULL;
     
@@ -41,6 +46,7 @@ t_no *criaArvore(){
     t_no *root = (t_no*)malloc(sizeof(t_no));
     
     root = cria_no();
+    root->folha = TRUE;
     
     return root;
 }
@@ -60,6 +66,7 @@ int cliParser(int argc, char *argv[], int *registerType){
 
     if (argc != 4){
         printf("Uso: %s nome_arquivo -r 1 ou 2\n\n1 - Indica Registros de tamanho variavel\n2 - Indica Registros de tamanho fixo\n\n", argv[0]);
+        
         validate = 0;
     } else{
         fp = fopen(argv[1], "r" );
@@ -89,22 +96,74 @@ int cliParser(int argc, char *argv[], int *registerType){
     }
     return validate;
 }
-void splitChild(t_no *split, int i, t_no *root){
+void splitChild(t_no *split, int i, t_no *newNodeY){
+    int j;
+    t_no *newNodeZ = (t_no*)malloc(sizeof(t_no));
+    newNodeY = split->pFilhos[i];
     
+    newNodeZ->folha = newNodeY->folha;
+    newNodeZ->contador = T-1;
+    
+    for(j = 1; j <= T-1; j++){
+        newNodeZ->chaves[j] = newNodeY->chaves[j+T];
+    }
+    if(!newNodeY->folha){
+        for(j = 1; j <= T; j++){
+            newNodeZ->pFilhos[j] = newNodeY->pFilhos[j+T];
+        }
+    }
+    newNodeY->pFilhos[i+1] = newNodeZ;
+    for(j = split->contador; j >= i; i--){
+        split->chaves[j+1] = split->chaves[j];
+    }
+    split->chaves[i] = newNodeY->chaves[T];
+    split->contador += 1;
 }
 
+void insertNonFull(t_no *node, t_chave *toInsert){
+    int i = node->contador;
+    
+    if(node->folha){
+        while(i >= 1 && ((toInsert->ident) < (node->chaves[i].ident))){
+            node->chaves[i+1] = node->chaves[i];
+            i -= 1;
+        }
+        node->chaves[i+1] = *toInsert;
+        node->contador += 1;
+    } else {
+        while(i >= 1 && ((toInsert->ident) < (node->chaves[i].ident))){
+            i -= 1;
+        }
+        i += 1;
+        printf("i = %d\n", i);
+        if(node->pFilhos[i]->contador == 4){
+            splitChild(node, i, node->pFilhos[i]); // Colocar terceiro parametro;
+            if((toInsert->ident) > (node->chaves[i].ident)){
+                i += 1;
+            }
+        }
+        insertNonFull(node->pFilhos[i], toInsert);
+    }
+}
+
+
 void insertBtree(t_no *root, t_chave *chave){
-    t_no *noAux;
+    t_no *newNode;
     t_no *rootAux;
     
-    root = rootAux;
-    if(root->contador == (2*M - 1)){
+    rootAux = root; 
+    if(root->contador == 4){
+        printf("Entrei aqui porra\n");
         /* Caso o no esteja cheio temos que executar o split*/
-        noAux = (t_no*)malloc(sizeof(t_no));
-        root = noAux;
-        noAux->contador = 0;
-        noAux->pFilhos[0] = rootAux;
-        splitChild();
+        newNode = (t_no*)malloc(sizeof(t_no));
+        root = newNode;
+        newNode->folha = FALSE;
+        newNode->contador = 0;
+        newNode->pFilhos[1] = rootAux;
+        splitChild(newNode, 1, rootAux);
+        insertNonFull(newNode, chave);
+    } else {
+        insertNonFull(rootAux, chave);
     }
     
 }
@@ -145,7 +204,7 @@ void pegaChaveVariavel(t_no *root){
     char string[8];
     int i = 0;
     int j;
-    int k = 1;
+    int k = 0;
     t_chave *chave;
     
     while(!feof(fp)){
@@ -162,6 +221,7 @@ void pegaChaveVariavel(t_no *root){
         k++;
         chave = criaChave(k, string, i);
         insertBtree(root, chave);
+        printf("In  seriu >%d< \n", k);
         while((fgetc(fp) != '\n')&&(!feof(fp))){
             fseek(fp,i,SEEK_SET);
             i++;
