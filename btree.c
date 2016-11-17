@@ -29,18 +29,18 @@ t_no *cria_no(){
     
     no->contador = 0;
     for (i=0;i<M-2;i++) {
-     no->chaves[i].ident = -1;
-      no->pFilhos[i] = NULL;
+        no->chaves[i].ident = -1;
+        no->pFilhos[i] = NULL
     }
     no->pFilhos[i] = NULL;
     
     return no;
 }
 
-t_root *criaArvore(){
-    t_root *root = (t_root*)malloc(sizeof(t_root));
+t_no *criaArvore(){
+    t_no *root = (t_no*)malloc(sizeof(t_no));
     
-    root->root = cria_no();
+    root = cria_no();
     
     return root;
 }
@@ -89,39 +89,59 @@ int cliParser(int argc, char *argv[], int *registerType){
     }
     return validate;
 }
-
-void insertBtree(t_chave *chave, t_root *root){
-    int i;
-    int spliter;
-    t_no *raiz = root->root;
-    t_no *novaRaiz;
-    t_no *folha;
+void splitChild(t_no *split, int i, t_no *root){
     
-    if(raiz->contador != 4){ /* Checa se a raiz possui mesno de 4 chaves */
-        i = 0;
-        while(raiz->chaves[i].ident == -1){
-            i++;
-        }
-        raiz->chaves[i] = *chave;
-        raiz->contador += 1;
-        printf("\tFoi\n");
-    } else {
-        spliter = raiz->contador + 1;
-        spliter = ceil(spliter/2.0f);
-        
-        novaRaiz = cria_no();
-        novaRaiz->chaves[0] = raiz->chaves[spliter-1];
-        novaRaiz->contador += 1;
-        
-        folha = cria_no();
-        folha->chaves[0] = raiz->chaves[spliter];
-        folha->contador += 1;
-         
-        printf("\tSoon\n");
-    }
 }
 
-void pegaChaveVariavel(t_root *root){
+void insertBtree(t_no *root, t_chave *chave){
+    t_no *noAux;
+    t_no *rootAux;
+    
+    root = rootAux;
+    if(root->contador == (2*M - 1)){
+        /* Caso o no esteja cheio temos que executar o split*/
+        noAux = (t_no*)malloc(sizeof(t_no));
+        root = noAux;
+        noAux->contador = 0;
+        noAux->pFilhos[0] = rootAux;
+        splitChild();
+    }
+    
+}
+
+
+// void insertBtree(t_chave *chave, t_root *root){
+//     int i;
+//     int spliter;
+//     t_no *raiz = root->root;
+//     t_no *novaRaiz;
+//     t_no *folha;
+//     
+//     if(raiz->contador != 4){ /* Checa se a raiz possui mesno de 4 chaves */
+//         i = 0;
+//         while(raiz->chaves[i].ident == -1){
+//             i++;
+//         }
+//         raiz->chaves[i] = *chave;
+//         raiz->contador += 1;
+//         printf("\tFoi\n");
+//     } else {
+//         spliter = raiz->contador + 1;
+//         spliter = ceil(spliter/2.0f);
+//         
+//         novaRaiz = cria_no();
+//         novaRaiz->chaves[0] = raiz->chaves[spliter-1];
+//         novaRaiz->contador += 1;
+//         
+//         folha = cria_no();
+//         folha->chaves[0] = raiz->chaves[spliter];
+//         folha->contador += 1;
+//          
+//         printf("\tSoon\n");
+//     }
+// }
+
+void pegaChaveVariavel(t_no *root){
     char string[8];
     int i = 0;
     int j;
@@ -141,7 +161,7 @@ void pegaChaveVariavel(t_root *root){
         printf("%s\t%d", string, k);
         k++;
         chave = criaChave(k, string, i);
-        insertBtree(chave, root);
+        insertBtree(root, chave);
         while((fgetc(fp) != '\n')&&(!feof(fp))){
             fseek(fp,i,SEEK_SET);
             i++;
@@ -165,7 +185,7 @@ void loadVariableBTree(){
 int main(int argc, char *argv[]){
     int registerType = 0;
     int cliCheck = cliParser(argc, argv, &registerType);
-    t_root *root;
+    t_no *root;
 
     if (cliCheck == 1){
         if (registerType == 1){
