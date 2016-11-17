@@ -126,7 +126,7 @@ void insertNonFull(t_no *node, t_chave *toInsert){
     if(node->folha){
         while(i >= 1 && ((toInsert->ident) < (node->chaves[i].ident))){
             node->chaves[i+1] = node->chaves[i];
-            i -= 1;
+            i -= 1; 
         }
         node->chaves[i+1] = *toInsert;
         node->contador += 1;
