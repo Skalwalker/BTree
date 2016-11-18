@@ -96,10 +96,10 @@ int cliParser(int argc, char *argv[], int *registerType){
     }
     return validate;
 }
-void splitChild(t_no *split, int i, t_no *newNodeY){
+void splitChild(t_no *nodeX, int i, t_no *newNodeY){
     int j;
     t_no *newNodeZ = (t_no*)malloc(sizeof(t_no));
-    newNodeY = split->pFilhos[i];
+    newNodeY = nodeX->pFilhos[i];
     
     newNodeZ->folha = newNodeY->folha;
     newNodeZ->contador = T-1;
@@ -112,12 +112,16 @@ void splitChild(t_no *split, int i, t_no *newNodeY){
             newNodeZ->pFilhos[j] = newNodeY->pFilhos[j+T];
         }
     }
-    newNodeY->pFilhos[i+1] = newNodeZ;
-    for(j = split->contador; j >= i; i--){
-        split->chaves[j+1] = split->chaves[j];
+    newNodeY->contador = T-1;
+    for(j = nodeX->contador+1; j >= i+1; j--){
+        nodeX->chaves[j+1] = nodeX->chaves[j];
     }
-    split->chaves[i] = newNodeY->chaves[T];
-    split->contador += 1;
+    nodeX->pFilhos[i+1] = newNodeZ;
+    for (j = nodeX->contador; j >= i; j--){
+        nodeX->chaves[j+1] = nodeX->chaves[j];
+    }
+    nodeX->chaves[i] = newNodeY->chaves[T];
+    nodeX->contador += 1;
 }
 
 void insertNonFull(t_no *node, t_chave *toInsert){
@@ -135,7 +139,6 @@ void insertNonFull(t_no *node, t_chave *toInsert){
             i -= 1;
         }
         i += 1;
-        printf("i = %d\n", i);
         if(node->pFilhos[i]->contador == 4){
             splitChild(node, i, node->pFilhos[i]); // Colocar terceiro parametro;
             if((toInsert->ident) > (node->chaves[i].ident)){
@@ -153,7 +156,6 @@ void insertBtree(t_no *root, t_chave *chave){
     
     rootAux = root; 
     if(root->contador == 4){
-        printf("Entrei aqui porra\n");
         /* Caso o no esteja cheio temos que executar o split*/
         newNode = (t_no*)malloc(sizeof(t_no));
         root = newNode;
@@ -165,40 +167,7 @@ void insertBtree(t_no *root, t_chave *chave){
     } else {
         insertNonFull(rootAux, chave);
     }
-    
 }
-
-
-// void insertBtree(t_chave *chave, t_root *root){
-//     int i;
-//     int spliter;
-//     t_no *raiz = root->root;
-//     t_no *novaRaiz;
-//     t_no *folha;
-//     
-//     if(raiz->contador != 4){ /* Checa se a raiz possui mesno de 4 chaves */
-//         i = 0;
-//         while(raiz->chaves[i].ident == -1){
-//             i++;
-//         }
-//         raiz->chaves[i] = *chave;
-//         raiz->contador += 1;
-//         printf("\tFoi\n");
-//     } else {
-//         spliter = raiz->contador + 1;
-//         spliter = ceil(spliter/2.0f);
-//         
-//         novaRaiz = cria_no();
-//         novaRaiz->chaves[0] = raiz->chaves[spliter-1];
-//         novaRaiz->contador += 1;
-//         
-//         folha = cria_no();
-//         folha->chaves[0] = raiz->chaves[spliter];
-//         folha->contador += 1;
-//          
-//         printf("\tSoon\n");
-//     }
-// }
 
 void pegaChaveVariavel(t_no *root){
     char string[8];
@@ -221,7 +190,8 @@ void pegaChaveVariavel(t_no *root){
         k++;
         chave = criaChave(k, string, i);
         insertBtree(root, chave);
-        printf("In  seriu >%d< \n", k);
+        printf("\tInseriu >%d< \n", k);
+        if(k == 5) break;
         while((fgetc(fp) != '\n')&&(!feof(fp))){
             fseek(fp,i,SEEK_SET);
             i++;
@@ -229,31 +199,35 @@ void pegaChaveVariavel(t_no *root){
     }
 }
 
-void loadFixedBTree(){
-    
-}
-
-
-
-void loadVariableBTree(){
-    while(!feof(fp)){
-        
+void printBtree(t_no *root){
+    int i;
+    if(root == NULL){
+        return;
     }
-
+    for(i = 1; i <= root->contador; i++){
+        printBtree(root->pFilhos[i]);
+        printf("%d ", root->chaves[i].ident);
+    }
+    printBtree(root->pFilhos[root->contador]);
 }
 
 int main(int argc, char *argv[]){
     int registerType = 0;
     int cliCheck = cliParser(argc, argv, &registerType);
     t_no *root;
+    
+    int i = 0;
 
     if (cliCheck == 1){
         if (registerType == 1){
             root = criaArvore();
             pegaChaveVariavel(root);
-            /*loadVariableBTree();*/
+            printf("\n");
+            for(i = 1; i <= 4; i++){
+                printf("%d\n", root->chaves[i].ident);
+            }
+            printBtree(root);
         } else if(registerType == 2) {
-            loadFixedBTree();
         } else {
             printf("Erro inesperado!");
         }
