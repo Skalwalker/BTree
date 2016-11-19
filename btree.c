@@ -40,9 +40,9 @@ t_no *cria_no(){
     /* Set the leaf indicator to false*/
     no->folha = FALSE;
     /* Populate the vector of keys and son with default values */
-    for (i=0;i<M-2;i++) {
+    for (i=1 ; i <= M-1; i++) {
         /* -1 is set to a non used key */
-        no->chaves[i].ident = -1;
+        no->chaves[i].ident = 0;
         /* NULL is set if the son have no pointer */
         no->pFilhos[i] = NULL;
     }
@@ -130,9 +130,9 @@ void splitChild(t_no *nodeX, int i, t_no *newNodeY){
     newNodeY = nodeX->pFilhos[i];
     
     newNodeZ->folha = newNodeY->folha;
-    newNodeZ->contador = T-1;
+    newNodeZ->contador = 2-1;
     
-    for(j = 1; j <= T-1; j++){
+    for(j = 1; j <= T; j++){
         newNodeZ->chaves[j] = newNodeY->chaves[j+T];
     }
     if(newNodeY->folha == FALSE){
@@ -170,8 +170,8 @@ void insertNonFull(t_no *node, t_chave *toInsert){
             i -= 1;
         }
         i += 1;
-        if(node->pFilhos[i]->contador == 2*T-1){
-            splitChild(node, i, node->pFilhos[i]); // Colocar terceiro parametro;
+        if(node->pFilhos[i]->contador == 4){
+            splitChild(node, i, node->pFilhos[i]);
             if((toInsert->ident) > (node->chaves[i].ident)){
                 i += 1;
             }
@@ -186,7 +186,7 @@ void insertBtree(t_tree *tree, t_chave *chave){
     t_no *newRoot = tree->root;
     t_no *aux;
 
-    if(newRoot->contador == 2*T-1){
+    if(newRoot->contador == 4){
         /* Caso o no esteja cheio temos que executar o split*/
         newNode = (t_no*)malloc(sizeof(t_no));
         tree->root = newNode;
@@ -217,7 +217,6 @@ void pegaChaveVariavel(t_tree *root){
             i++;
             j++;
         }
-        
         k++;
         printf("%s\t%d", string, k);
         chave = criaChave(k, string, i);
@@ -233,28 +232,32 @@ void pegaChaveVariavel(t_tree *root){
 
 void printBtree (t_no *a, int level) {
    int i;
+   int j = 0;
+   int k = 0;
 
 
    for (i = 0; i < level; i++) { printf("  "); }
-
-
+   // printf("Contador de a === %d\n", a->contador);
    printf("|");
    for (i = 1; i <= a->contador; i++) {
       printf("%d|", a->chaves[i].ident);
    }
    printf("\n");
+   
+   while(k <= 5){
+       if(a->pFilhos[k] != NULL) j++;
+       k++;
+   }
 
-
-   for (i = 1; i <= a->contador; i++) {
+   for (i = 1; i <= j; i++) {
       if (a->folha == FALSE) {
          printBtree(a->pFilhos[i], level + 1);
-      }
+     }
    }
 }
 
 t_no *searchBTree(t_no *root, int k, int *retI){
     int i = 1;
-    
     while((i<=root->contador) && (k > root->chaves[i].ident)){
         i += 1;
     }
@@ -287,15 +290,25 @@ int main(int argc, char *argv[]){
     int cliCheck = cliParser(argc, argv, &registerType);
     t_tree *root = (t_tree*)malloc(sizeof(t_tree));
     t_no *pesquisa = (t_no*)malloc(sizeof(t_no));
+    int i;
 
     if (cliCheck == 1){
         if (registerType == 1){
             root = criaArvore(root);
             pegaChaveVariavel(root);
             printf("\n");
-            //printBtree(root->root->pFilhos[2], 1);
-            pesquisa = searchBTree(root->root, 1, &retI);
-            printf("%d", pesquisa->chaves[retI].ident);
+            
+            // printf(">%d<\n", root->root->contador);
+            // for(i = 1; i < 5; i++){
+            //     printf("[%d]", root->root->chaves[i].ident);
+            // }
+            printf("\n");
+            printBtree(root->root, 0);
+            for(i = 1; i <= 40; i++){
+                pesquisa = searchBTree(root->root, i, &retI);
+                printf("%d ", pesquisa->chaves[retI].ident);
+            }
+
             
         } else if(registerType == 2) {
         } else {
