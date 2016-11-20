@@ -155,7 +155,7 @@ void insertNonFull(t_no *node, t_chave *toInsert){
     int i = node->contador;
     
     if(node->folha){
-        while(i >= 1 && ((toInsert->ident) < (node->chaves[i].ident))){
+        while((i >= 1) && ((toInsert->ident) < (node->chaves[i].ident))){
             node->chaves[i+1] = node->chaves[i];
             i -= 1; 
         }
@@ -163,7 +163,7 @@ void insertNonFull(t_no *node, t_chave *toInsert){
         node->contador += 1;
         
     } else {
-        while(i >= 1 && ((toInsert->ident) < (node->chaves[i].ident))){
+        while((i >= 1) && ((toInsert->ident) < (node->chaves[i].ident))){
             i -= 1;
         }
         i += 1;
@@ -234,7 +234,6 @@ void printBtree (t_no *a, int level) {
 
 
    printf("|");
-   //printf("%d", a->contador);
    for (i = 1; i <= a->contador; i++) {
       printf("%d|", a->chaves[i].ident);
 
@@ -249,6 +248,22 @@ void printBtree (t_no *a, int level) {
    }
 }
 
+t_no *searchBTree(t_no *root, int k, int *retI){
+    int i = 1;
+    
+    while((i<=root->contador) && (k > root->chaves[i].ident)){
+        i += 1;
+    }
+    if((i<=root->contador) && (k == root->chaves[i].ident)){
+        *retI = i;
+        return root;
+    } else if(root->folha){
+        return NULL;
+    } else {
+        return searchBTree(root->pFilhos[i], k, retI);
+    }
+    
+}
 
 // void printBtree(t_no *node){
 //     int i;
@@ -264,19 +279,20 @@ void printBtree (t_no *a, int level) {
 
 int main(int argc, char *argv[]){
     int registerType = 0;
+    int retI= 0;
     int cliCheck = cliParser(argc, argv, &registerType);
     t_tree *root = (t_tree*)malloc(sizeof(t_tree));
+    t_no *pesquisa = (t_no*)malloc(sizeof(t_no));
 
     if (cliCheck == 1){
         if (registerType == 1){
             root = criaArvore(root);
             pegaChaveVariavel(root);
             printf("\n");
-            int i;
-            for(i=1;i<=4;i++){
-                printf("%d ", root->root->chaves[i].ident);
-            }
-            printBtree(root->root, 5);
+            //printBtree(root->root, 5);
+            pesquisa = searchBTree(root->root, 1, &retI);
+            printf("%d", pesquisa->chaves[retI].ident);
+            
         } else if(registerType == 2) {
         } else {
             printf("Erro inesperado!");
