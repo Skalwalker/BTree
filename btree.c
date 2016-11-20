@@ -389,12 +389,38 @@ int main(int argc, char *argv[]){
                 }
             } else {
                 int contador = 0;
+                int contadorAll = 0;
+                int selection = 0;
+                int flag = 0;
+                int tam = NOME;
+                i = 0;
                 rewind(fp);
-                while(contador < 123){
-                    while(contador < NOME){
+                while(contadorAll < 123 || selection < 3){
+                    while(contador < tam && flag != 2){
+                        printf("%d\n", contador);
                         fseek(fp, prrAux, SEEK_SET);
+                        stringOut[i] = fgetc(fp);
+                        printf("%s\n", stringOut);
                         
+                        if(fgetc(fp) == ' '){
+                            flag++;
+                        } else {
+                            flag = 0;
+                        }
+                        prrAux++;
+                        getchar();
+                        contador++;
                     }
+                    if(stringOut[i] == ' ' && stringOut[i+1] == ' '){
+                        stringOut[i] = '\0';
+                    }
+                    selection++;
+                    if (selection == 1){
+                        tam = DATA;
+                    } else {
+                        tam = EMPRESA;
+                    }
+                    printf("%s\n", stringOut);
                 }
             }
             
