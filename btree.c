@@ -7,8 +7,12 @@
 #define TRUE 1
 #define FALSE 0
 #define T 3
+#define NOME 69
+#define DATA 22
+#define EMPRESA 26
 
 FILE *fp;
+int contNos = 0;
 
 /* Structure of a key */
 typedef struct chave{
@@ -19,6 +23,7 @@ typedef struct chave{
 
 /* Structure of a node */
 typedef struct no{
+    int ident;
     int contador; /* Counter */
     int folha; /* Tell if the node is a leaf */
     t_chave chaves[M];//M-1 /* Vector of keys */
@@ -30,11 +35,13 @@ typedef struct Tree{
 }t_tree;
 
 /* Create the node */
-t_no *cria_no(){
+t_no *cria_no(int newIdent){
     int i;
     /* Alloc memory*/
     t_no *no = (t_no*)malloc(sizeof(t_no));
     
+    no->ident = newIdent;
+    contNos++;
     /* Set counter to 0*/
     no->contador = 0;
     /* Set the leaf indicator to false*/
@@ -56,7 +63,7 @@ t_no *cria_no(){
 /* Create a new tree */
 t_tree *criaArvore(t_tree *tree){
     /* Create the root node */
-    t_no *x = cria_no();
+    t_no *x = cria_no(contNos);
     /* Set as a leaf to true */ 
     x->folha = TRUE;
     /* Set the new root as the tree root */
@@ -86,11 +93,11 @@ int cliParser(int argc, char *argv[], int *registerType){
     
     /* Check the amount of parsed args */
     if (argc != 4){
-        printf("Uso: %s nome_arquivo -r 1 ou 2\n\n1 - Indica Registros de tamanho variavel\n2 - Indica Registros de tamanho fixo\n\n", argv[0]);
+        printf("Uso: %s <nome_arquivo> -r 1 ou 2\n\n1 - Indica Registros de tamanho variavel\n2 - Indica Registros de tamanho fixo\n\n", argv[0]);
         
         validate = 0;
     } else{
-        fp = fopen(argv[1], "r" );
+        fp = fopen(argv[1], "r");
 
         /* Check if the file passed as arg really exist. */
         if (fp == NULL){
@@ -126,7 +133,7 @@ int cliParser(int argc, char *argv[], int *registerType){
 
 void splitChild(t_no *nodeX, int i, t_no *newNodeY){
     int j;
-    t_no *newNodeZ = cria_no();
+    t_no *newNodeZ = cria_no(contNos);
     newNodeY = nodeX->pFilhos[i];
     
     newNodeZ->folha = newNodeY->folha;
@@ -141,8 +148,7 @@ void splitChild(t_no *nodeX, int i, t_no *newNodeY){
         }
     }
     newNodeY->contador = T-1;
-    printf("\n>>>>%d\t%d\n", nodeX->contador, i);
-    
+        
     for(j = nodeX->contador+1; j >= i+1; j--){
         nodeX->pFilhos[j+1] = nodeX->pFilhos[j];
     }
@@ -200,10 +206,10 @@ void insertBtree(t_tree *tree, t_chave *chave){
     }
 }
 
-void pegaChaveVariavel(t_tree *root){
-    char string[8];
+void pegaChave(t_tree *root, int tamReg){
+    char string[tamReg];
     int i = 0;
-    int j;
+    int j = 0;
     int k = 0;
     t_chave *chave;
     
@@ -211,11 +217,20 @@ void pegaChaveVariavel(t_tree *root){
         j = 0;
         
         printf("%d\t", i);
-        while(fgetc(fp) != ';'){
-            fseek(fp, i, SEEK_SET);
-            string[j] = fgetc(fp);
-            i++;
-            j++;
+        if(tamReg == 8){
+            while(fgetc(fp) != ';'){
+                fseek(fp, i, SEEK_SET);
+                string[j] = fgetc(fp);
+                i++;
+                j++;
+            }
+        } else {
+            while(j < 5){
+                fseek(fp, i, SEEK_SET);
+                string[j] = fgetc(fp);
+                i++;
+                j++;
+            }
         }
         k++;
         printf("%s\t%d", string, k);
@@ -256,7 +271,24 @@ void printBtree (t_no *a, int level) {
    }
 }
 
-t_no *searchBTree(t_no *root, int k, int *retI){
+// void printBtree(t_no *node, int level){
+//     int i = 0;
+//     
+//     printf("N%d\t", level);
+//     for(i = 1; i <= 5; i++){
+//         if(node->pFilhos[i] != NULL){
+//             printf("P%d\n", );
+//         }
+//     }
+// }
+
+void inserirRegistroVariavel(){
+    
+}
+
+void inserirRegistroFixo(){}
+
+t_no *searchBTree(t_no *root, int k, int *retI, int *seeks){
     int i = 1;
     while((i<=root->contador) && (k > root->chaves[i].ident)){
         i += 1;
@@ -265,55 +297,117 @@ t_no *searchBTree(t_no *root, int k, int *retI){
         *retI = i;
         return root;
     } else if(root->folha){
+        *seeks++;
         return NULL;
     } else {
-        return searchBTree(root->pFilhos[i], k, retI);
+        return searchBTree(root->pFilhos[i], k, retI, seeks);
     }
     
 }
 
-// void printBtree(t_no *node){
-//     int i;
-//     if(node == NULL){
-//         return;
-//     }
-//     for(i = 1; i <= node->contador; i++){
-//         printBtree(node->pFilhos[i]);
-//         printf("%d ", node->chaves[i].ident);
-//     }
-//     printBtree(node->pFilhos[node->contador]);
-// }
+int menuopc(){
+    int option = 0;
+            
+    while(option != 1 || option != 2 || option != 3){
+        
+        printf("\n1 - Buscar Registro\n2 - Inserir Registro\n3 - Mostrar arvore-B\n\n>>>");
+        scanf("%d", &option);
+        
+        if(option == 1){
+            return 1;
+        } else if(option == 2){
+            return 2;
+        } else {
+            return 3;
+        }
+    }
+    
+    
+}
+
 
 int main(int argc, char *argv[]){
-    int registerType = 0;
-    int retI= 0;
-    int cliCheck = cliParser(argc, argv, &registerType);
+    int option, prrAux, chaveInt, seeks = 0, retI= 0, registerType = 0;;
+    int i = 0;
+    int j = 0;
+    char chavePes[10];
+    char stringOut[200];
     t_tree *root = (t_tree*)malloc(sizeof(t_tree));
     t_no *pesquisa = (t_no*)malloc(sizeof(t_no));
-    int i;
+    
+    int cliCheck = cliParser(argc, argv, &registerType);
 
     if (cliCheck == 1){
-        if (registerType == 1){
-            root = criaArvore(root);
-            pegaChaveVariavel(root);
-            printf("\n");
             
-            // printf(">%d<\n", root->root->contador);
-            // for(i = 1; i < 5; i++){
-            //     printf("[%d]", root->root->chaves[i].ident);
-            // }
-            printf("\n");
-            printBtree(root->root, 0);
-            for(i = 1; i <= 40; i++){
-                pesquisa = searchBTree(root->root, i, &retI);
-                printf("%d ", pesquisa->chaves[retI].ident);
-            }
-
+        root = criaArvore(root);
+        if(registerType == 1){
+            pegaChave(root, 8);
             
-        } else if(registerType == 2) {
         } else {
-            printf("Erro inesperado!");
+            pegaChave(root, 5);
         }
+
+        option = menuopc();
+        
+        if(option == 1){
+            printf("Insira a chave primaria a ser pesquisada: ");
+            scanf("%s", chavePes);
+            getchar();
+            if(registerType == 1){
+                for(i = 0; i < 6; i++){
+                    chavePes[i] = chavePes[i+2];
+                }
+                chavePes[5] = '\0';
+            } else {
+                chavePes[0] = chavePes[2];
+                chavePes[1] = chavePes[3];
+                chavePes[2] = '\0';
+            }            
+            
+            chaveInt = atoi(chavePes);
+            pesquisa = searchBTree(root->root, chaveInt, &retI, &seeks);
+            rewind(fp);
+            
+            prrAux = pesquisa->chaves[retI].prr;
+            j = 0;
+            fseek(fp, prrAux, SEEK_SET);
+            if(registerType == 1){
+                prrAux++;
+
+                while((fgetc(fp) != '\n') && (!feof(fp))){
+                    while((fgetc(fp) != ';') && (fgetc(fp) != '\n')){
+                        fseek(fp, prrAux, SEEK_SET);
+                        stringOut[j] = fgetc(fp);
+                        prrAux++;
+                        j++;
+                    }
+                    stringOut[j] = '\0';
+                    printf("%s\n", stringOut);
+                    j = 0;
+                    prrAux++;
+                    fseek(fp, prrAux, SEEK_SET);
+                }
+            } else {
+                int contador = 0;
+                rewind(fp);
+                while(contador < 123){
+                    while(contador < NOME){
+                        fseek(fp, prrAux, SEEK_SET);
+                        
+                    }
+                }
+            }
+            
+        } else if(option == 2){
+            
+        } else {
+            // printBtree(root->root, 0);
+        }
+
+        // printBtree(root->root, 0);
+        //     pesquisa = searchBTree(root->root, i, &retI);
+        //     printf("%d ", pesquisa->chaves[retI].ident);
+
     }
 
 
