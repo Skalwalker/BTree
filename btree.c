@@ -65,6 +65,7 @@ t_tree *criaArvore(t_tree *tree){
     return tree;
 }
 
+
 /* Method for populating the key */
 t_chave *criaChave(int ident, char chave[], int estPrr){
     /* Alloc space for the new struct key */
@@ -125,7 +126,7 @@ int cliParser(int argc, char *argv[], int *registerType){
 
 void splitChild(t_no *nodeX, int i, t_no *newNodeY){
     int j;
-    t_no *newNodeZ = (t_no*)malloc(sizeof(t_no));
+    t_no *newNodeZ = cria_no();
     newNodeY = nodeX->pFilhos[i];
     
     newNodeZ->folha = newNodeY->folha;
@@ -134,14 +135,16 @@ void splitChild(t_no *nodeX, int i, t_no *newNodeY){
     for(j = 1; j <= T-1; j++){
         newNodeZ->chaves[j] = newNodeY->chaves[j+T];
     }
-    if(!newNodeY->folha){
+    if(newNodeY->folha == FALSE){
         for(j = 1; j <= T; j++){
             newNodeZ->pFilhos[j] = newNodeY->pFilhos[j+T];
         }
     }
     newNodeY->contador = T-1;
+    printf("\n>>>>%d\t%d\n", nodeX->contador, i);
+    
     for(j = nodeX->contador+1; j >= i+1; j--){
-        nodeX->chaves[j+1] = nodeX->chaves[j];
+        nodeX->pFilhos[j+1] = nodeX->pFilhos[j];
     }
     nodeX->pFilhos[i+1] = newNodeZ;
     for (j = nodeX->contador; j >= i; j--){
@@ -154,7 +157,7 @@ void splitChild(t_no *nodeX, int i, t_no *newNodeY){
 void insertNonFull(t_no *node, t_chave *toInsert){
     int i = node->contador;
     
-    if(node->folha){
+    if(node->folha == TRUE){
         while((i >= 1) && ((toInsert->ident) < (node->chaves[i].ident))){
             node->chaves[i+1] = node->chaves[i];
             i -= 1; 
@@ -181,6 +184,7 @@ void insertNonFull(t_no *node, t_chave *toInsert){
 void insertBtree(t_tree *tree, t_chave *chave){
     t_no *newNode;
     t_no *newRoot = tree->root;
+    t_no *aux;
 
     if(newRoot->contador == 2*T-1){
         /* Caso o no esteja cheio temos que executar o split*/
@@ -213,8 +217,9 @@ void pegaChaveVariavel(t_tree *root){
             i++;
             j++;
         }
-        printf("%s\t%d", string, k);
+        
         k++;
+        printf("%s\t%d", string, k);
         chave = criaChave(k, string, i);
         insertBtree(root, chave);
         printf("\tInseriu >%d< \n", k);
@@ -236,7 +241,6 @@ void printBtree (t_no *a, int level) {
    printf("|");
    for (i = 1; i <= a->contador; i++) {
       printf("%d|", a->chaves[i].ident);
-
    }
    printf("\n");
 
@@ -289,7 +293,7 @@ int main(int argc, char *argv[]){
             root = criaArvore(root);
             pegaChaveVariavel(root);
             printf("\n");
-            //printBtree(root->root, 5);
+            //printBtree(root->root->pFilhos[2], 1);
             pesquisa = searchBTree(root->root, 1, &retI);
             printf("%d", pesquisa->chaves[retI].ident);
             

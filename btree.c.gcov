@@ -11,232 +11,303 @@
         -:    6:#define M 5
         -:    7:#define TRUE 1
         -:    8:#define FALSE 0
-        -:    9:#define T 2
+        -:    9:#define T 3
         -:   10:
         -:   11:FILE *fp;
         -:   12:
-        -:   13:typedef struct chave{
-        -:   14:    int ident;
-        -:   15:    char chave[8];
-        -:   16:    int prr; /* Qtd de prr, 4*/
-        -:   17:}t_chave;
-        -:   18:
-        -:   19:typedef struct no{
-        -:   20:    int contador; /* Conta a contidade de chaves, 4 */
-        -:   21:    int folha;
-        -:   22:    t_chave chaves[M];//M-1 /* Estrutura de vetor do tipo t_chave, 4 */
-        -:   23:    struct no *pFilhos[M+1];//M /* Qtd  max de filhos 5*/
-        -:   24:}t_no;
-        -:   25:
-        -:   26:// typedef struct root{
-        -:   27://     t_no *root;
-        -:   28:// }t_root;
-        -:   29:
-        1:   30:t_no *cria_no(){
-        -:   31:    int i;
-        1:   32:    t_no *no = (t_no*)malloc(sizeof(t_no));
-        -:   33:    
-        1:   34:    no->contador = 0;
-        1:   35:    no->folha = FALSE;
-        4:   36:    for (i=0;i<M-2;i++) {
-        3:   37:        no->chaves[i].ident = -1;
-        3:   38:        no->pFilhos[i] = NULL;
-        -:   39:    }
-        1:   40:    no->pFilhos[i] = NULL;
-        -:   41:    
-        1:   42:    return no;
-        -:   43:}
-        -:   44:
-        1:   45:t_no *criaArvore(){
-        1:   46:    t_no *root = (t_no*)malloc(sizeof(t_no));
-        -:   47:    
-        1:   48:    root = cria_no();
-        1:   49:    root->folha = TRUE;
-        -:   50:    
-        1:   51:    return root;
-        -:   52:}
-        -:   53:
-       40:   54:t_chave *criaChave(int ident, char chave[], int estPrr){
-       40:   55:    t_chave *estChave = (t_chave*)malloc(sizeof(t_chave));
-        -:   56:    
-       40:   57:    estChave->ident = ident;
-       40:   58:    strcpy(estChave->chave, chave);
-       40:   59:    estChave->prr = estPrr;
-        -:   60:    
-       40:   61:    return estChave;
-        -:   62:}
-        -:   63:
-        2:   64:int cliParser(int argc, char *argv[], int *registerType){
-        2:   65:    int validate = 0;
-        -:   66:
-        2:   67:    if (argc != 4){
-        1:   68:        printf("Uso: %s nome_arquivo -r 1 ou 2\n\n1 - Indica Registros de tamanho variavel\n2 - Indica Registros de tamanho fixo\n\n", argv[0]);
-        -:   69:        
-        1:   70:        validate = 0;
-        -:   71:    } else{
-        1:   72:        fp = fopen(argv[1], "r" );
-        -:   73:
-        1:   74:        if (fp == NULL){
-    #####:   75:            printf("\nErro ao abrir arquivo, encerrando...\n\n");
-    #####:   76:            validate = 0;
-        -:   77:        } else {
-        1:   78:            if(strcmp(argv[2],"-r")){
-    #####:   79:                printf("\nErro! Parametro nao reconhecido, voce quis dizer '-r' ?\n\n");
-    #####:   80:                validate = 0;
-        -:   81:            } else {
-        1:   82:                if (strcmp(argv[3],"1") == 0){
-        1:   83:                    printf("\nCarregando B-Tree de registros de tamanho variavel...\n\n");
-        1:   84:                    validate = 1;
-        1:   85:                    *registerType = 1;
-    #####:   86:                } else if(strcmp(argv[3],"2") == 0){
-    #####:   87:                    printf("\nCarregando B-Tree de registros de tamanho fixo...\n\n");
-    #####:   88:                    validate = 1;
-    #####:   89:                    *registerType = 2;
-        -:   90:                } else {
-    #####:   91:                    printf("\nErro! Valor de %s precisa ser 1 ou 2!\n\n", argv[2]);
-    #####:   92:                    validate = 0;
-        -:   93:                }
-        -:   94:            }
-        -:   95:        }
-        -:   96:    }
-        2:   97:    return validate;
-        -:   98:}
-        9:   99:void splitChild(t_no *nodeX, int i, t_no *newNodeY){
-        -:  100:    int j;
-        9:  101:    t_no *newNodeZ = (t_no*)malloc(sizeof(t_no));
-        9:  102:    newNodeY = nodeX->pFilhos[i];
-        -:  103:    
-        9:  104:    newNodeZ->folha = newNodeY->folha;
-        9:  105:    newNodeZ->contador = T-1;
-        -:  106:    
-       18:  107:    for(j = 1; j <= T-1; j++){
-        9:  108:        newNodeZ->chaves[j] = newNodeY->chaves[j+T];
-        -:  109:    }
-        9:  110:    if(!newNodeY->folha){
-    #####:  111:        for(j = 1; j <= T; j++){
-    #####:  112:            newNodeZ->pFilhos[j] = newNodeY->pFilhos[j+T];
-        -:  113:        }
-        -:  114:    }
-        9:  115:    newNodeY->contador = T-1;
-        9:  116:    for(j = nodeX->contador+1; j >= i+1; j--){
-    #####:  117:        nodeX->chaves[j+1] = nodeX->chaves[j];
-        -:  118:    }
-        9:  119:    nodeX->pFilhos[i+1] = newNodeZ;
-        9:  120:    for (j = nodeX->contador; j >= i; j--){
-    #####:  121:        nodeX->chaves[j+1] = nodeX->chaves[j];
-        -:  122:    }
-        9:  123:    nodeX->chaves[i] = newNodeY->chaves[T];
-        9:  124:    nodeX->contador += 1;
-        9:  125:}
+        -:   13:/* Structure of a key */
+        -:   14:typedef struct chave{
+        -:   15:    int ident; /* Identifier of the key */
+        -:   16:    char chave[8]; /* Key as string size */
+        -:   17:    int prr; /* PRR Value on file */
+        -:   18:}t_chave;
+        -:   19:
+        -:   20:/* Structure of a node */
+        -:   21:typedef struct no{
+        -:   22:    int contador; /* Counter */
+        -:   23:    int folha; /* Tell if the node is a leaf */
+        -:   24:    t_chave chaves[M];//M-1 /* Vector of keys */
+        -:   25:    struct no *pFilhos[M+1];//M /* Vector of nodes */
+        -:   26:}t_no;
+        -:   27:
+        -:   28:typedef struct Tree{
+        -:   29:    t_no *root;
+        -:   30:}t_tree;
+        -:   31:
+        -:   32:/* Create the node */
+        -:   33:t_no *cria_no(){
+        -:   34:    int i;
+        -:   35:    /* Alloc memory*/
+       32:   36:    t_no *no = (t_no*)malloc(sizeof(t_no));
+        -:   37:    
+        -:   38:    /* Set counter to 0*/
+       16:   39:    no->contador = 0;
+        -:   40:    /* Set the leaf indicator to false*/
+       16:   41:    no->folha = FALSE;
+        -:   42:    /* Populate the vector of keys and son with default values */
+      128:   43:    for (i=0;i<M-2;i++) {
+        -:   44:        /* -1 is set to a non used key */
+       48:   45:        no->chaves[i].ident = -1;
+        -:   46:        /* NULL is set if the son have no pointer */
+       48:   47:        no->pFilhos[i] = NULL;
+       48:   48:    }
+        -:   49:    /* Extra NULL set because there is one more pointer to son */
+       16:   50:    no->pFilhos[i] = NULL;
+        -:   51:    
+        -:   52:    /* Return the node */
+       16:   53:    return no;
+        -:   54:}
+        -:   55:
+        -:   56:/* Create a new tree */
+        -:   57:t_tree *criaArvore(t_tree *tree){
+        -:   58:    /* Create the root node */
+        1:   59:    t_no *x = cria_no();
+        -:   60:    /* Set as a leaf to true */ 
+        1:   61:    x->folha = TRUE;
+        -:   62:    /* Set the new root as the tree root */
+        1:   63:    tree->root = x;
+        -:   64:    /* Return the new root */
+        1:   65:    return tree;
+        -:   66:}
+        -:   67:
+        -:   68:
+        -:   69:/* Method for populating the key */
+        -:   70:t_chave *criaChave(int ident, char chave[], int estPrr){
+        -:   71:    /* Alloc space for the new struct key */
+       40:   72:    t_chave *newKey = (t_chave*)malloc(sizeof(t_chave));
+        -:   73:    /* Set the stuct key identifier */
+       40:   74:    newKey->ident = ident;
+        -:   75:    /* Set the struct key key */
+       40:   76:    strcpy(newKey->chave, chave);
+        -:   77:    /* Set the struct key prr */
+       40:   78:    newKey->prr = estPrr;
+        -:   79:    /* Return the new key */
+       40:   80:    return newKey;
+        -:   81:}
+        -:   82:
+        -:   83:/* Method for handling the Command Line Arguments */
+        -:   84:int cliParser(int argc, char *argv[], int *registerType){
+        2:   85:    int validate = 0;
+        -:   86:    
+        -:   87:    /* Check the amount of parsed args */
+        2:   88:    if (argc != 4){
+        1:   89:        printf("Uso: %s nome_arquivo -r 1 ou 2\n\n1 - Indica Registros de tamanho variavel\n2 - Indica Registros de tamanho fixo\n\n", argv[0]);
+        -:   90:        
+        1:   91:        validate = 0;
+        1:   92:    } else{
+        1:   93:        fp = fopen(argv[1], "r" );
+        -:   94:
+        -:   95:        /* Check if the file passed as arg really exist. */
+        1:   96:        if (fp == NULL){
+    #####:   97:            printf("\nErro ao abrir arquivo, encerrando...\n\n");
+    #####:   98:            validate = 0;
+    #####:   99:        } else {
+        -:  100:            /* Check if the arg is right */
+        1:  101:            if(strcmp(argv[2],"-r")){
+    #####:  102:                printf("\nErro! Parametro nao reconhecido, voce quis dizer '-r' ?\n\n");
+    #####:  103:                validate = 0;
+    #####:  104:            } else {
+        -:  105:                /* Check if the value for the arg is valid and reference the value as an int */
+        1:  106:                if (strcmp(argv[3],"1") == 0){
+        1:  107:                    printf("\nCarregando B-Tree de registros de tamanho variavel...\n\n");
+        1:  108:                    validate = 1;
+        1:  109:                    *registerType = 1;
+        1:  110:                } else if(strcmp(argv[3],"2") == 0){
+    #####:  111:                    printf("\nCarregando B-Tree de registros de tamanho fixo...\n\n");
+    #####:  112:                    validate = 1;
+    #####:  113:                    *registerType = 2;
+    #####:  114:                } else {
+    #####:  115:                    printf("\nErro! Valor de %s precisa ser 1 ou 2!\n\n", argv[2]);
+    #####:  116:                    validate = 0;
+        -:  117:                }
+        -:  118:            }
+        -:  119:        }
+        -:  120:    }
+        -:  121:    
+        -:  122:    /* Return if the CLI is ok*/
+        2:  123:    return validate;
+        -:  124:}
+        -:  125:
         -:  126:
-       49:  127:void insertNonFull(t_no *node, t_chave *toInsert){
-       49:  128:    int i = node->contador;
-        -:  129:    
-       49:  130:    if(node->folha){
-       80:  131:        while(i >= 1 && ((toInsert->ident) < (node->chaves[i].ident))){
-    #####:  132:            node->chaves[i+1] = node->chaves[i];
-    #####:  133:            i -= 1; 
-        -:  134:        }
-       40:  135:        node->chaves[i+1] = *toInsert;
-       40:  136:        node->contador += 1;
-        -:  137:    } else {
-       18:  138:        while(i >= 1 && ((toInsert->ident) < (node->chaves[i].ident))){
-    #####:  139:            i -= 1;
-        -:  140:        }
-        9:  141:        i += 1;
-        9:  142:        if(node->pFilhos[i]->contador == 4){
-    #####:  143:            splitChild(node, i, node->pFilhos[i]); // Colocar terceiro parametro;
-    #####:  144:            if((toInsert->ident) > (node->chaves[i].ident)){
-    #####:  145:                i += 1;
-        -:  146:            }
-        -:  147:        }
-        9:  148:        insertNonFull(node->pFilhos[i], toInsert);
-        -:  149:    }
-       49:  150:}
-        -:  151:
-        -:  152:
-       40:  153:void insertBtree(t_no *root, t_chave *chave){
-        -:  154:    t_no *newNode;
-        -:  155:    t_no *rootAux;
-        -:  156:    
-       40:  157:    rootAux = root; 
-       40:  158:    if(root->contador == 4){
-        -:  159:        /* Caso o no esteja cheio temos que executar o split*/
-        9:  160:        newNode = (t_no*)malloc(sizeof(t_no));
-        9:  161:        root = newNode;
-        9:  162:        newNode->folha = FALSE;
-        9:  163:        newNode->contador = 0;
-        9:  164:        newNode->pFilhos[1] = rootAux;
-        9:  165:        splitChild(newNode, 1, rootAux);
-        9:  166:        insertNonFull(newNode, chave);
-        -:  167:    } else {
-       31:  168:        insertNonFull(rootAux, chave);
-        -:  169:    }
-       40:  170:}
-        -:  171:
-        1:  172:void pegaChaveVariavel(t_no *root){
-        -:  173:    char string[8];
-        1:  174:    int i = 0;
-        -:  175:    int j;
-        1:  176:    int k = 0;
-        -:  177:    t_chave *chave;
-        -:  178:    
-       42:  179:    while(!feof(fp)){
-       40:  180:        j = 0;
-        -:  181:        
-       40:  182:        printf("%d\t", i);
-      360:  183:        while(fgetc(fp) != ';'){
-      280:  184:            fseek(fp, i, SEEK_SET);
-      280:  185:            string[j] = fgetc(fp);
-      280:  186:            i++;
-      280:  187:            j++;
-        -:  188:        }
-       40:  189:        printf("%s\t%d", string, k);
-       40:  190:        k++;
-       40:  191:        chave = criaChave(k, string, i);
-       40:  192:        insertBtree(root, chave);
-       40:  193:        printf("\tInseriu >%d< \n", k);
-     4361:  194:        while((fgetc(fp) != '\n')&&(!feof(fp))){
-     4281:  195:            fseek(fp,i,SEEK_SET);
-     4281:  196:            i++;
-        -:  197:        }
-        -:  198:    }
-        1:  199:}
-        -:  200:
-        6:  201:void printBtree(t_no *root){
-        -:  202:    int i;
-        6:  203:    if(root == NULL){
-        5:  204:        return;
-        -:  205:    }
-        5:  206:    for(i = 1; i <= root->contador; i++){
-        4:  207:        printBtree(root->pFilhos[i]);
-        4:  208:        printf("%d ", root->chaves[i].ident);
-        -:  209:    }
-        1:  210:    printBtree(root->pFilhos[root->contador]);
-        -:  211:}
-        -:  212:
-        2:  213:int main(int argc, char *argv[]){
-        2:  214:    int registerType = 0;
-        2:  215:    int cliCheck = cliParser(argc, argv, &registerType);
-        -:  216:    t_no *root;
-        -:  217:    
-        2:  218:    int i = 0;
-        -:  219:
-        2:  220:    if (cliCheck == 1){
-        1:  221:        if (registerType == 1){
-        1:  222:            root = criaArvore();
-        1:  223:            pegaChaveVariavel(root);
-        1:  224:            printf("\n");
-        5:  225:            for(i = 1; i <= 4; i++){
-        4:  226:                printf("%d\n", root->chaves[i].ident);
-        -:  227:            }
-        1:  228:            printBtree(root);
-    #####:  229:        } else if(registerType == 2) {
-        -:  230:        } else {
-    #####:  231:            printf("Erro inesperado!");
-        -:  232:        }
-        -:  233:    }
-        -:  234:
-        -:  235:
-        2:  236:    return 0;
-        -:  237:}
+        -:  127:void splitChild(t_no *nodeX, int i, t_no *newNodeY){
+        -:  128:    int j;
+       15:  129:    t_no *newNodeZ = cria_no();
+       15:  130:    newNodeY = nodeX->pFilhos[i];
+        -:  131:    
+       15:  132:    newNodeZ->folha = newNodeY->folha;
+       15:  133:    newNodeZ->contador = T-1;
+        -:  134:    
+       90:  135:    for(j = 1; j <= T-1; j++){
+       30:  136:        newNodeZ->chaves[j] = newNodeY->chaves[j+T];
+       30:  137:    }
+       15:  138:    if(newNodeY->folha == FALSE){
+       24:  139:        for(j = 1; j <= T; j++){
+        9:  140:            newNodeZ->pFilhos[j] = newNodeY->pFilhos[j+T];
+        9:  141:        }
+        3:  142:    }
+       15:  143:    newNodeY->contador = T-1;
+       15:  144:    printf("\n>>>>%d\t%d\n", nodeX->contador, i);
+        -:  145:    
+       60:  146:    for(j = nodeX->contador+1; j >= i; j--){
+       15:  147:        nodeX->pFilhos[j+1] = nodeX->pFilhos[j];
+       15:  148:    }
+       15:  149:    nodeX->pFilhos[i+1] = newNodeZ;
+       30:  150:    for (j = nodeX->contador; j >= i; j--){
+    #####:  151:        nodeX->chaves[j+1] = nodeX->chaves[j];
+    #####:  152:    }
+       15:  153:    nodeX->chaves[i] = newNodeY->chaves[T];
+       15:  154:    nodeX->contador += 1;
+       15:  155:}
+        -:  156:
+        -:  157:void insertNonFull(t_no *node, t_chave *toInsert){
+       97:  158:    int i = node->contador;
+        -:  159:    
+       97:  160:    if(node->folha == TRUE){
+      159:  161:        while((i >= 1) && ((toInsert->ident) < (node->chaves[i].ident))){
+    #####:  162:            node->chaves[i+1] = node->chaves[i];
+    #####:  163:            i -= 1; 
+        -:  164:        }
+       40:  165:        node->chaves[i+1] = *toInsert;
+       40:  166:        node->contador += 1;
+        -:  167:        
+       40:  168:    } else {
+      228:  169:        while((i >= 1) && ((toInsert->ident) < (node->chaves[i].ident))){
+    #####:  170:            i -= 1;
+        -:  171:        }
+       57:  172:        i += 1;
+       57:  173:        if(node->pFilhos[i]->contador == 2*T-1){
+       13:  174:            splitChild(node, i, node->pFilhos[i]); // Colocar terceiro parametro;
+       13:  175:            if((toInsert->ident) > (node->chaves[i].ident)){
+       13:  176:                i += 1;
+       13:  177:            }
+       13:  178:        }
+       57:  179:        insertNonFull(node->pFilhos[i], toInsert);
+        -:  180:    }
+       97:  181:}
+        -:  182:
+        -:  183:
+        -:  184:void insertBtree(t_tree *tree, t_chave *chave){
+        -:  185:    t_no *newNode;
+       40:  186:    t_no *newRoot = tree->root;
+        -:  187:    t_no *aux;
+        -:  188:
+       40:  189:    if(newRoot->contador == 2*T-1){
+        -:  190:        /* Caso o no esteja cheio temos que executar o split*/
+        2:  191:        newNode = (t_no*)malloc(sizeof(t_no));
+        2:  192:        tree->root = newNode;
+        2:  193:        newNode->folha = FALSE;
+        2:  194:        newNode->contador = 0;
+        2:  195:        newNode->pFilhos[1] = newRoot;
+        2:  196:        splitChild(newNode, 1, newRoot);
+        2:  197:        insertNonFull(newNode, chave);
+        2:  198:    } else {
+       38:  199:        insertNonFull(newRoot, chave);
+        -:  200:    }
+       40:  201:}
+        -:  202:
+        -:  203:void pegaChaveVariavel(t_tree *root){
+        -:  204:    char string[8];
+        1:  205:    int i = 0;
+        -:  206:    int j;
+        1:  207:    int k = 0;
+        -:  208:    t_chave *chave;
+        -:  209:    
+       82:  210:    while(!feof(fp)){
+       40:  211:        j = 0;
+        -:  212:        
+       40:  213:        printf("%d\t", i);
+      640:  214:        while(fgetc(fp) != ';'){
+      280:  215:            fseek(fp, i, SEEK_SET);
+      280:  216:            string[j] = fgetc(fp);
+      280:  217:            i++;
+      280:  218:            j++;
+        -:  219:        }
+        -:  220:        
+       40:  221:        k++;
+       40:  222:        printf("%s\t%d", string, k);
+       40:  223:        chave = criaChave(k, string, i);
+       40:  224:        insertBtree(root, chave);
+       40:  225:        printf("\tInseriu >%d< \n", k);
+    17245:  226:        while((fgetc(fp) != '\n')&&(!feof(fp))){
+     4281:  227:            fseek(fp,i,SEEK_SET);
+     4281:  228:            i++;
+        -:  229:        }
+        -:  230:    }
+        1:  231:}
+        -:  232:
+        -:  233:
+        -:  234:void printBtree (t_no *a, int level) {
+        -:  235:   int i;
+        -:  236:
+        -:  237:
+    #####:  238:   for (i = 0; i < level; i++) { printf("  "); }
+        -:  239:
+        -:  240:
+    #####:  241:   printf("|");
+    #####:  242:   for (i = 1; i <= a->contador; i++) {
+    #####:  243:      printf("%d|", a->chaves[i].ident);
+    #####:  244:   }
+    #####:  245:   printf("\n");
+        -:  246:
+        -:  247:
+    #####:  248:   for (i = 1; i <= a->contador; i++) {
+    #####:  249:      if (a->folha == FALSE) {
+    #####:  250:         printBtree(a->pFilhos[i], level + 1);
+    #####:  251:      }
+    #####:  252:   }
+    #####:  253:}
+        -:  254:
+        -:  255:t_no *searchBTree(t_no *root, int k, int *retI){
+    #####:  256:    int i = 1;
+        -:  257:    
+    #####:  258:    while((i<=root->contador) && (k > root->chaves[i].ident)){
+    #####:  259:        i += 1;
+        -:  260:    }
+    #####:  261:    if((i<=root->contador) && (k == root->chaves[i].ident)){
+    #####:  262:        *retI = i;
+    #####:  263:        return root;
+    #####:  264:    } else if(root->folha){
+    #####:  265:        return NULL;
+        -:  266:    } else {
+    #####:  267:        return searchBTree(root->pFilhos[i], k, retI);
+        -:  268:    }
+        -:  269:    
+    #####:  270:}
+        -:  271:
+        -:  272:// void printBtree(t_no *node){
+        -:  273://     int i;
+        -:  274://     if(node == NULL){
+        -:  275://         return;
+        -:  276://     }
+        -:  277://     for(i = 1; i <= node->contador; i++){
+        -:  278://         printBtree(node->pFilhos[i]);
+        -:  279://         printf("%d ", node->chaves[i].ident);
+        -:  280://     }
+        -:  281://     printBtree(node->pFilhos[node->contador]);
+        -:  282:// }
+        -:  283:
+        -:  284:int main(int argc, char *argv[]){
+        2:  285:    int registerType = 0;
+        2:  286:    int retI= 0;
+        2:  287:    int cliCheck = cliParser(argc, argv, &registerType);
+        2:  288:    t_tree *root = (t_tree*)malloc(sizeof(t_tree));
+        2:  289:    t_no *pesquisa = (t_no*)malloc(sizeof(t_no));
+        -:  290:
+        2:  291:    if (cliCheck == 1){
+        1:  292:        if (registerType == 1){
+        1:  293:            root = criaArvore(root);
+        1:  294:            pegaChaveVariavel(root);
+        1:  295:            printf("\n");
+        -:  296:            //printBtree(root->root->pFilhos[2], 1);
+        -:  297:            //pesquisa = searchBTree(root->root, 1, &retI);
+        -:  298:            //printf("%d", pesquisa->chaves[retI].ident);
+        -:  299:            
+        1:  300:        } else if(registerType == 2) {
+    #####:  301:        } else {
+    #####:  302:            printf("Erro inesperado!");
+        -:  303:        }
+        1:  304:    }
+        -:  305:
+        -:  306:
+        2:  307:    return 0;
+        -:  308:}
