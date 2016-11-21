@@ -492,7 +492,7 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
         prrAux++;
 
         while((fgetc(fp) != '\n') && (!feof(fp))){
-            while((fgetc(fp) != ';') && (fgetc(fp) != '\n')){
+            while((fgetc(fp) != ';') && (fgetc(fp) != '\n') && (!feof(fp))){
                 fseek(fp, prrAux, SEEK_SET);
                 stringOut[j] = fgetc(fp);
                 prrAux++;
