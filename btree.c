@@ -253,7 +253,6 @@ void printBtree (t_no *a, int level) {
 
 
    for (i = 0; i < level; i++) { printf("  "); }
-   // printf("Contador de a === %d\n", a->contador);
    printf("|");
    for (i = 1; i <= a->contador; i++) {
       printf("%d|", a->chaves[i].ident);
@@ -463,13 +462,14 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
     t_no *pesquisa = (t_no*)malloc(sizeof(t_no));
     char chavePes[10];
     char stringOut[200];
-    int i = 0;
-    int j = 0;
-    int  prrAux, chaveInt, seeks = 0, retI= 0;
+    int i = 0, j = 0, contador = 0, contadorAll = 0, selection = 0, flag = 0;
+    int prrAux, chaveInt, seeks = 0, retI= 0;
+    int tam = NOME;
     
     printf("Insira a chave primaria a ser pesquisada: ");
     scanf("%s", chavePes);
     getchar();
+    printf("\n");
     if(*registerType == 1){
         for(i = 0; i < 6; i++){
             chavePes[i] = chavePes[i+2];
@@ -499,25 +499,20 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
                 j++;
             }
             stringOut[j] = '\0';
-            printf("%s\n", stringOut);
-            j = 0;
             prrAux++;
             fseek(fp, prrAux, SEEK_SET);
+            j = 0;
+            
+            printf("|%s\n", stringOut);
         }
     } else {
-        int contador = 0;
-        int contadorAll = 0;
-        int selection = 0;
-        int flag = 0;
-        int tam = NOME;
         i = 0;
         rewind(fp);
-        while(contadorAll < 123 || selection < 3){
+        
+        while(contadorAll < 123 && selection < 3){
             while(contador < tam && flag != 2){
-                printf("%d\n", contador);
                 fseek(fp, prrAux, SEEK_SET);
                 stringOut[i] = fgetc(fp);
-                printf("%s\n", stringOut);
 
                 if(fgetc(fp) == ' '){
                     flag++;
@@ -525,19 +520,32 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
                     flag = 0;
                 }
                 prrAux++;
-                getchar();
                 contador++;
+                contadorAll++;
+                i++;
             }
-            if(stringOut[i] == ' ' && stringOut[i+1] == ' '){
+            
+            
+            if(flag == 2){
+                stringOut[i-1] = '\0';
+            } else {
                 stringOut[i] = '\0';
             }
+            
+            prrAux += (tam - contador);
             selection++;
+            
             if (selection == 1){
                 tam = DATA;
             } else {
                 tam = EMPRESA;
             }
-            printf("%s\n", stringOut);
+            
+            i = 0;
+            contador = 0;
+            flag = 0;
+            
+            printf("|%s\n", stringOut);
         }
     }
 }
