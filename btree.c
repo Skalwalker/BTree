@@ -31,9 +31,95 @@ typedef struct no{
     struct no *pFilhos[M+1];//M /* Vector of nodes */
 }t_no;
 
+/* Structure of a Tree */
 typedef struct Tree{
     t_no *root;
 }t_tree;
+
+
+typedef struct Elemento{
+    t_no *no;
+    int level;
+    int pagina;
+    struct Elemento *proximo;
+}t_elemento;
+/* Structure of a list to implement a queue for print */
+typedef struct lista{
+	t_elemento *primeiro;
+	t_elemento *ultimo;
+}t_lista;
+
+/* Structure of a queue */
+typedef struct fila{
+	t_lista *l;
+}t_fila;
+
+
+/*Start of list functions*/
+t_lista *criaLista(){
+   t_lista *l = (t_lista *)malloc(sizeof(t_lista));
+   l->primeiro = NULL;
+   l->ultimo = NULL;
+   return l;
+}
+
+void insereFinal(t_no *no, int level, int pagina, t_lista *l){
+   t_elemento *novoultimo = (t_elemento*)malloc(sizeof(t_elemento));
+   novoultimo->no = no;
+   novoultimo->level = level;
+   novoultimo->pagina = pagina;
+   novoultimo->proximo = NULL; 
+   if(l->primeiro == NULL){
+      l->primeiro = novoultimo;
+   }else{
+     l->ultimo->proximo = novoultimo;
+   }
+   l->ultimo = novoultimo;
+}
+
+int estaVazia(t_lista *l){
+    if(l->primeiro == NULL){
+       return 1;
+    }
+    return 0;
+}
+
+t_elemento *removeInicio(t_lista *l){
+    if(estaVazia(l)){
+        return NULL;
+    }
+    t_elemento *tmp = l->primeiro;
+    t_elemento *removido = l->primeiro;
+    l->primeiro = l->primeiro->proximo;
+    free(removido);
+    if(l->primeiro == NULL){
+       l->ultimo = NULL;
+    }
+    return tmp;
+}
+/*End of list functions*/
+
+
+/* Start of Queue Functions */
+t_fila *criaFila(){
+   t_fila *f =  (t_fila*)malloc(sizeof(t_fila));
+   f->l = criaLista();
+   return f;
+}
+
+void enfileirar(t_no *no, int level, int pagina, t_fila *f){
+  insereFinal(no, level, pagina, f->l);
+}
+
+t_elemento *desenfileirar(t_fila *f){
+  return removeInicio(f->l);
+}
+
+int estaVaziaFila(t_fila *f){
+    return estaVazia(f->l);
+}
+/* End of Queue Functions */
+
 
 /* Create the node */
 t_no *cria_no(int newIdent){
@@ -225,7 +311,7 @@ void pegaChave(t_tree *root, int tamReg){
                 j++;
             }
         } else {
-            while(j < 5){
+            while(j < 4){
                 fseek(fp, i, SEEK_SET);
                 string[j] = fgetc(fp);
                 i++;
@@ -246,30 +332,30 @@ void pegaChave(t_tree *root, int tamReg){
 }
 
 
-void printBtree (t_no *a, int level) {
-   int i;
-   int j = 0;
-   int k = 0;
-
-
-   for (i = 0; i < level; i++) { printf("  "); }
-   printf("|");
-   for (i = 1; i <= a->contador; i++) {
-      printf("%d|", a->chaves[i].ident);
-   }
-   printf("\n");
-
-   while(k <= 5){
-       if(a->pFilhos[k] != NULL) j++;
-       k++;
-   }
-
-   for (i = 1; i <= j; i++) {
-      if (a->folha == FALSE) {
-         printBtree(a->pFilhos[i], level + 1);
-     }
-   }
-}
+// void printBtree (t_no *a, int level) {
+//    int i;
+//    int j = 0;
+//    int k = 0;
+// 
+// 
+//    for (i = 0; i < level; i++) { printf("  "); }
+//    printf("|");
+//    for (i = 1; i <= a->contador; i++) {
+//       printf("%d|", a->chaves[i].ident);
+//    }
+//    printf("\n");
+// 
+//    while(k <= 5){
+//        if(a->pFilhos[k] != NULL) j++;
+//        k++;
+//    }
+// 
+//    for (i = 1; i <= j; i++) {
+//       if (a->folha == FALSE) {
+//          printBtree(a->pFilhos[i], level + 1);
+//      }
+//    }
+// }
 
 t_no *searchBTree(t_no *root, int k, int *retI, int *seeks){
     int i = 1;
@@ -551,41 +637,71 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
 }
 
 
-void printGivenLevel(t_no* root){
+void printBtree(t_no* root){
+    t_fila *fila;
+    int i = 0, j = 0, k = 0, w = 1;
+    int pagina = 0;
+    int level = 0;
+    t_no *no;
+    t_elemento *elemento = (t_elemento*)malloc(sizeof(t_elemento));
     
-    int i = 0, j = 0, k = 0;
+    fila = criaFila();
+    enfileirar(root, level, pagina, fila);
     
-    if (root->folha == TRUE){
-        for(i=0;i<=root->contador;i++){
-            printf("%s",root->chaves[i].chave);
-        }   
-    }    
-    
-    for(i=0;i<=root->contador;i++){
-        printf("%s",root->chaves[i].chave);
-    }
-    
-    while(k <= 5){
-        if(root->pFilhos[k] != NULL) j++;
-        k++;
-    }
-    
-    for(i=0;i<=j;i++){
-        printGivenLevel(root->pFilhos[i]);
+    while(!estaVaziaFila(fila)){
+        elemento = desenfileirar(fila);
+        no = elemento->no;
+        if((elemento->level != level)||(level == 0)){
+            printf("\n\nN%d:\tP%d:\t", elemento->level, elemento->pagina);
+        } else {
+            printf(";\t\tP%d:\t", elemento->pagina);
+        }
+        
+        for(i=1;i<=no->contador;i++){
+            printf("%s", no->chaves[i].chave);
+            if(i != no->contador){
+                printf("|");
+            }
+        }
+        
+        while(k <= 5){
+            if(no->pFilhos[k] != NULL){
+                j++;
+            } 
+            k++;
+        }
+        
+        printf("\t");
+        for(i = 1; i<=no->contador+1; i++){
+            if(no->folha == FALSE){
+                printf("%d", elemento->pagina+w);
+                w++;
+                if(i!=no->contador+1){
+                    printf("|");
+                }
+            } else {
+                printf("-");
+                if(i!=no->contador+1){
+                    printf("|");
+                }
+            }
+            
+        }
+        w--;
+
+        level = elemento->level;
+        
+
+        for (i = 1; i <= no->contador+1; i++) {
+            if(no->pFilhos[i] != NULL){
+                pagina++;
+                enfileirar(no->pFilhos[i], level + 1, pagina, fila);
+            }
+        }
+        
     }
 
 } 
-
-void printLevelOrder(t_no *root)
-{
-    while(root->folha == FALSE){
-        printGivenLevel(root);
-    }
-}
- 
-/* Print nodes at a given level */
-
-
 
 
 int menuopc(){
@@ -628,7 +744,8 @@ int main(int argc, char *argv[]){
                 insertFile(argv, root, &registerType);
                 fclose(fp);
             } else if(option == 3) {
-                printLevelOrder(root->root);
+                printBtree(root->root);
+                printf("\n");
             }
         }
     }
