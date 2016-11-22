@@ -190,7 +190,6 @@ void insertNonFull(t_no *node, t_chave *toInsert){
 void insertBtree(t_tree *tree, t_chave *chave){
     t_no *newNode;
     t_no *newRoot = tree->root;
-    t_no *aux;
 
     if(newRoot->contador == 4){
         /* Caso o no esteja cheio temos que executar o split*/
@@ -282,11 +281,7 @@ void printBtree (t_no *a, int level) {
 //     }
 // }
 
-void inserirRegistroVariavel(){
-    
-}
 
-void inserirRegistroFixo(){}
 
 t_no *searchBTree(t_no *root, int k, int *retI, int *seeks){
     int i = 1;
@@ -297,7 +292,7 @@ t_no *searchBTree(t_no *root, int k, int *retI, int *seeks){
         *retI = i;
         return root;
     } else if(root->folha){
-        *seeks++;
+        *seeks = *seeks + 1;
         return NULL;
     } else {
         return searchBTree(root->pFilhos[i], k, retI, seeks);
@@ -325,6 +320,29 @@ int menuopc(){
     
 }
 
+// 
+// void printBtree2(t_no *root, int lvl, int page, int printLvl){
+//     
+//     
+//     if (printLvl) {
+//         printf("N%d:\t", lvl);
+//     }
+//     
+//     printf("P%d:\t", page);
+//     for (int i = 1; i <= root->contador ; i++) {
+//         printf("%s|\n", root->chaves[i].chave);
+//     }
+//     
+//     for (int i = 1; i <= root->contador+1 ; i++) {
+//         if (root->pFilhos[i] != NULL) {
+//             if (i == 1) {
+//                 printBtree2(root->pFilhos[i], lvl+1, page+i+lvl*M , TRUE);
+//             }
+//             printBtree2(root->pFilhos[i], lvl+1, page+i, FALSE);
+//         }
+//     }
+// }
+
 
 int main(int argc, char *argv[]){
     int option, prrAux, chaveInt, seeks = 0, retI= 0, registerType = 0;;
@@ -342,14 +360,14 @@ int main(int argc, char *argv[]){
         root = criaArvore(root);
         if(registerType == 1){
             pegaChave(root, 8);
-            
         } else {
             pegaChave(root, 5);
         }
-
+        fclose(fp);
         option = menuopc();
         
         if(option == 1){
+            fp = fopen(argv[1], "r");
             printf("Insira a chave primaria a ser pesquisada: ");
             scanf("%s", chavePes);
             getchar();
@@ -423,9 +441,50 @@ int main(int argc, char *argv[]){
                     printf("%s\n", stringOut);
                 }
             }
-            
+            fclose(fp);
         } else if(option == 2){
-            
+            fp = fopen(argv[1], "a");
+            if(registerType == 1){
+                char nome[100];
+                char sobrenome[100];
+                char empresa[100];
+                char endereco[100];
+                char cidade[100];
+                char estado[3];
+                char zip[100];
+                char cell1[100];
+                char cell2[100];
+                printf("Vamos inserir um novo registro:\nNome: ");
+                getchar();
+                scanf("%[^\n]%*c", nome);
+                fprintf(fp, "\n%s;", nome);
+                printf("\nSobrenome: ");
+                scanf("%[^\n]%*c", sobrenome);
+                fprintf(fp, "%s;", sobrenome);
+                printf("\nEmpresa: ");
+                scanf("%[^\n]%*c", empresa);
+                fprintf(fp, "%s;", empresa);
+                printf("\nEndereco: ");
+                scanf("%[^\n]%*c", endereco);
+                fprintf(fp, "%s;", endereco);
+                printf("\nCidade: ");
+                scanf("%[^\n]%*c", cidade);
+                fprintf(fp, "%s;", cidade);
+                printf("\nEstado (2 CHAR!): ");
+                scanf("%[^\n]%*c", estado);
+                fprintf(fp, "%s;", estado);
+                printf("\nZIP: ");
+                scanf("%[^\n]%*c", zip);
+                fprintf(fp, "%s;", zip);
+                printf("\nTelefone 1: ");
+                scanf("%[^\n]%*c", cell1);
+                fprintf(fp, "%s;", cell1);
+                printf("\nTelefone 2: ");
+                scanf("%[^\n]%*c", cell2);
+                fprintf(fp, "%s", cell2);
+            } else {
+                
+            }
         } else {
             // printBtree(root->root, 0);
         }
