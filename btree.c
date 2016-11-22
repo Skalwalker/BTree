@@ -550,6 +550,44 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
     }
 }
 
+
+void printGivenLevel(t_no* root){
+    
+    int i = 0, j = 0, k = 0;
+    
+    if (root->folha == TRUE){
+        for(i=0;i<=root->contador;i++){
+            printf("%s",root->chaves[i].chave);
+        }   
+    }    
+    
+    for(i=0;i<=root->contador;i++){
+        printf("%s",root->chaves[i].chave);
+    }
+    
+    while(k <= 5){
+        if(root->pFilhos[k] != NULL) j++;
+        k++;
+    }
+    
+    for(i=0;i<=j;i++){
+        printGivenLevel(root->pFilhos[i]);
+    }
+
+} 
+
+void printLevelOrder(t_no *root)
+{
+    while(root->folha == FALSE){
+        printGivenLevel(root);
+    }
+}
+ 
+/* Print nodes at a given level */
+
+
+
+
 int menuopc(){
     int option = 0;
 
@@ -590,7 +628,7 @@ int main(int argc, char *argv[]){
                 insertFile(argv, root, &registerType);
                 fclose(fp);
             } else if(option == 3) {
-                // printBtree(root->root, 0);
+                printLevelOrder(root->root);
             }
         }
     }
