@@ -11,6 +11,12 @@
 #define DATA 22
 #define EMPRESA 26
 
+#define RED "\x1b[31m"
+#define RESET "\x1b[0m"
+#define GREEN "\x1b[32m"
+#define BACKGREEN "\x1b[42m"
+#define BACKCYAN "\x1b[46m"
+
 FILE *fp;
 int contNos = 0;
 int last = 0;
@@ -91,7 +97,6 @@ t_elemento *removeInicio(t_lista *l){
     t_elemento *tmp = l->primeiro;
     t_elemento *removido = l->primeiro;
     l->primeiro = l->primeiro->proximo;
-    free(removido);
     if(l->primeiro == NULL){
        l->ultimo = NULL;
     }
@@ -298,7 +303,10 @@ void pegaChave(t_tree *root, int tamReg){
     int j = 0;
     int k = 0;
     t_chave *chave;
+    int w = 0;
+    // color[100];
 
+printf(GREEN "PRR:\tCHAVE:\t\n" RESET);
     while(!feof(fp)){
         j = 0;
 
@@ -309,6 +317,7 @@ void pegaChave(t_tree *root, int tamReg){
                 string[j] = fgetc(fp);
                 i++;
                 j++;
+                string[j] = '\0';
             }
         } else {
             while(j < 4){
@@ -317,13 +326,15 @@ void pegaChave(t_tree *root, int tamReg){
                 i++;
                 j++;
             }
+            string[j] = '\0';
         }
         k++;
         last = k;
-        printf("%s\t%d", string, k);
+        
+        printf(RED "%s\t" RESET "%d", string, k);
         chave = criaChave(k, string, i);
         insertBtree(root, chave);
-        printf("\tInseriu >%d< \n", k);
+        printf(RED "\tInseriu >%d< \n" RESET, k);
         while((fgetc(fp) != '\n')&&(!feof(fp))){
             fseek(fp,i,SEEK_SET);
             i++;
@@ -551,7 +562,7 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
     int i = 0, j = 0, contador = 0, contadorAll = 0, selection = 0, flag = 0;
     int prrAux, chaveInt, seeks = 0, retI= 0;
     int tam = NOME;
-    
+
     printf("Insira a chave primaria a ser pesquisada: ");
     scanf("%s", chavePes);
     getchar();
@@ -574,6 +585,8 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
     prrAux = pesquisa->chaves[retI].prr;
     j = 0;
     fseek(fp, prrAux, SEEK_SET);
+    
+    printf(RED "REGISTRO PESQUISADO:\n" RESET);
     if(*registerType == 1){
         prrAux++;
 
@@ -588,9 +601,10 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
             prrAux++;
             fseek(fp, prrAux, SEEK_SET);
             j = 0;
-            
-            printf("|%s\n", stringOut);
+            printf(RED"-----\n"RESET);
+            printf(RED "| " RESET "%s\n", stringOut);
         }
+        printf(RED"-----\n"RESET);
     } else {
         i = 0;
         rewind(fp);
@@ -630,34 +644,34 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
             i = 0;
             contador = 0;
             flag = 0;
-            
-            printf("|%s\n", stringOut);
+
+            printf(RED"-----\n"RESET);
+            printf(RED "| " RESET "%s\n", stringOut);            
         }
+        printf(RED"-----\n"RESET);
     }
 }
-
 
 void printBtree(t_no* root){
     t_fila *fila;
     int i = 0, j = 0, k = 0, w = 1;
     int pagina = 0;
     int level = 0;
-    t_no *no;
+    t_no *no = (t_no*)malloc(sizeof(t_no));
     t_elemento *elemento = (t_elemento*)malloc(sizeof(t_elemento));
     
     fila = criaFila();
     enfileirar(root, level, pagina, fila);
-    
     while(!estaVaziaFila(fila)){
         elemento = desenfileirar(fila);
         no = elemento->no;
         if((elemento->level != level)||(level == 0)){
-            printf("\n\nN%d:\tP%d:\t", elemento->level, elemento->pagina);
+            printf(RED "\n\nN%d:" RESET GREEN "\tP%d:\t" RESET, elemento->level, elemento->pagina);
         } else {
-            printf(";\t\tP%d:\t", elemento->pagina);
+            printf(GREEN ";\t\tP%d:\t" RESET, elemento->pagina);
         }
         
-        for(i=1;i<=no->contador;i++){
+        for(i = 1; i <= no->contador; i++){
             printf("%s", no->chaves[i].chave);
             if(i != no->contador){
                 printf("|");
@@ -672,7 +686,7 @@ void printBtree(t_no* root){
         }
         
         printf("\t");
-        for(i = 1; i<=no->contador+1; i++){
+        for(i = 1; i <= no->contador+1; i++){
             if(no->folha == FALSE){
                 printf("%d", elemento->pagina+w);
                 w++;
@@ -703,7 +717,6 @@ void printBtree(t_no* root){
 
 } 
 
-
 int menuopc(){
     int option = 0;
 
@@ -712,8 +725,7 @@ int menuopc(){
         printf("\n1 - Buscar Registro\n2 - Inserir Registro\n3 - Mostrar arvore-B\n4 - Finalizar Programa\n\n>>>");
         scanf("%d", &option);
         
-    }
-    
+    }    
     return option;
 }
 
@@ -749,7 +761,5 @@ int main(int argc, char *argv[]){
             }
         }
     }
-
-
     return 0;
 }
