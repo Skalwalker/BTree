@@ -377,9 +377,10 @@ t_no *searchBTree(t_no *root, int k, int *retI, int *seeks){
         *retI = i;
         return root;
     } else if(root->folha){
-        *seeks = *seeks + 1;
+        (*seeks)++;
         return NULL;
     } else {
+        (*seeks)++;
         return searchBTree(root->pFilhos[i], k, retI, seeks);
     }
 
@@ -650,6 +651,7 @@ void searchFile(char *argv[], t_tree *root ,int *registerType){
         }
         printf(RED"-----\n"RESET);
     }
+    printf("NUMERO DE SEEKS: %d\n", seeks);
 }
 
 void printBtree(t_no* root){
