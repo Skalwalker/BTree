@@ -1,3 +1,14 @@
+/*
+	Titulo: Criacao e simulacao de Arvore-B
+	Disciplina: Organização de Arquivos – Turma C
+	Semestre: 2/2016
+	Prof.: Andre Drummond
+	Alunos:
+	- Renato Nobre 15/0146696
+	- Khalil Carsten 15/0134495 - LIDER
+*/
+
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
